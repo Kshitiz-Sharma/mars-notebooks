@@ -1,0 +1,10 @@
+*/target/**
+target/**
+*.log
+*.log.*
+*.iml
+.idea
+.svn
+.pyc
+.class
+data/
