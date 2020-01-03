@@ -1,9 +1,11 @@
 <!-- MarkdownTOC -->
 
 - About
-- Dependencies
-    - TODO
-- Prompt
+        - Dependencies
+        - TODO
+        - Conventions
+- Config
+        - Prompt
 - Shortcuts
         - Improved clip
 - Themes
@@ -23,10 +25,15 @@
 <!-- /MarkdownTOC -->
 
 # About
-- This notebook defines various utility functions for working with Cygwin
-- General shell based functions that aren't specific to Cygwin customization are put in a separate notebook
+- This is a sample notebook that demonstrates
+    + The layout of a mars notebook
+    + Writing appropriate documentation and usage information
+    + Loading other notebooks via dependencies
+- It defines various utility functions for working with Cygwin
+- General Shell-based functions that aren't specific to Cygwin customization are in a separate notebook **shell.sh.md**.
+- For instructions on running the notebook, see the primary documentation
 
-# Dependencies
+### Dependencies
 - Load the dependencies for this notebook
 
 ```shell
@@ -34,24 +41,27 @@ mars-load-dep shell
 mars-load-dep logging
 ```
 
-## TODO
-- ??
+### TODO
+- Document the elements of the prompt string. What do the various special codes represent?
 
-# Prompt
-- Replace the default cygwin prompt `kshar@DESKTOP-9ORBQI8 /cygdrive/c/Windows` with a more concise `kshar /cygdrive/c/Windows`
+### Conventions
+- The function names are written in a way to aid auto-completion on shell. So `Cygwin-pid-get-by-process-name` is preferred to more grammatically correct `cygwin-get-pid-by-process-name`. This allows typing `cygwin` on the shell and then tabbing to view all the cygwin related functions. Then typing `pid` and tabbing to see PID management functions.
+
+# Config
+### Prompt
+- Replace the default Cygwin prompt, which looks like `kshar@DESKTOP-9ORBQI8 /cygdrive/c/Windows` with a more concise `kshar /cygdrive/c/Windows`.
 
 ```shell
 export PS1='\[\e]0;\w\a\]\n\[\e[32m\]\u \[\e[33m\]\w\[\e[0m\]\n\$ '
 ```
 
-
 # Shortcuts
 ### Improved clip
 - Function to read/write to windows clipboard from CLI
 - When used with a pipe directs the input coming on *STDIN* to the windows clip utility
-- Otherwise invokes the cygwin clipboard device to print out clipboard contents to stdout
+- Otherwise invokes the Cygwin clipboard device to print out clipboard contents to stdout
 
->Usage:
+>**Usage**:
 echo 'text to be copied to clipboard' | clip <br>
 clip # Outputs 'text to be copied to clipboard' <br>
 
@@ -70,9 +80,9 @@ clip() {
 # Themes
 ## Theme initializer
 - Function to set custom theme colors based on RGB hex values
-- The comments in the code snippet show what attribute is being changed. So passing `DC322F` (red) as the 4th argument would change all the blacks to red
+- The comments in the code snippet below show what attribute is being changed. So passing `DC322F` (red) as the 4th argument would change all the blacks to red
 
->Usage: cygwin-theme-set 657B83 FDF6E3 DC322F 073642 002B36 DC322F CB4B16 859900 586E75 B58900 657B83 268BD2 839496 D33682 6C71C4 2AA198 93A1A1 EEE8D5 FDF6E3
+>**Usage**: cygwin-theme-set 657B83 FDF6E3 DC322F 073642 002B36 DC322F CB4B16 859900 586E75 B58900 657B83 268BD2 839496 D33682 6C71C4 2AA198 93A1A1 EEE8D5 FDF6E3
 
 ```shell
 cygwin-theme-set() {
@@ -99,6 +109,11 @@ cygwin-theme-set() {
 ```
 
 ## List
+- A list of predefined themes using the theme set function defined earlier
+
+>**Usage**: invoke the alias by name
+cygwin-theme-pastel
+
 ### Pastel
 ```shell
 alias cygwin-theme-pastel='cygwin-theme-set d0d0d0 1c1c1c ffaf0 80e0a0 ccc aaa d78787 df8787 afd787 afdf87 f7f7af ffffaf 87afd7 87afdf d7afd7 dfafdf afd7d7 afdfdf e6e6e6 eeeeee'
@@ -132,6 +147,11 @@ alias cygwin-theme-solarised-light='cygwin-theme-set 657B83 FDF6E3 DC322F 073642
 ```
 
 ## Auto selection
+- Automatically select theme based on time of the day
+- Selects a light theme during the day and dark on in the evening
+
+>**Usage**: cygwin-theme-auto
+
 ```shell
 cygwin-theme-auto() {
     H=$(date +%H)
@@ -145,9 +165,9 @@ cygwin-theme-auto() {
 
 # Process management
 ### Find PID by name
-- The `ps` utility doesn't work properly on Cygwin. It doesn't show the processes launched outside Cygwin
-- Windows `wmic` utility can be used for this but it's hard to remember its syntax
-- This function serves as a simplified facade over wmic
+- The `ps` utility doesn't work correctly on Cygwin. It doesn't show the processes launched outside Cygwin
+- Windows `wmic` utility is used for this, but it's hard to remember its syntax.
+- This function serves as a simplified facade over `wmic`.
 
 >**Usage**: cygwin-pid-get-by-process-name java
 
@@ -158,6 +178,12 @@ cygwin-pid-get-by-process-name() {
 ```
 
 ### Function to kill given list of pids
+- On Windows, the `ps` utility does not correctly kill processes
+- These functions allow killing a list of processes using the Windows taskkill utility
+
+>**Sytax**: cygwin-pid-kill [pid1] [pid2] <br>
+**Usage**: cygwin-pid-kill 1419 2395
+
 ```shell
 cygwin-pid-kill() {
     for i in "$@"; do
@@ -171,4 +197,3 @@ cygwin-pid-kill-force() {
     done
 }
 ```
-

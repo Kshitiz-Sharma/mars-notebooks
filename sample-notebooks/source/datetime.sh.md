@@ -28,7 +28,7 @@
 
 # Current time
 ## Readable
-- Short readable format
+- Short, readable format
 
 ```shell
 DATE_FORMAT_SHORT=+%d%b%g
@@ -158,7 +158,7 @@ date-convert-from-epoch() {
 - To get last 7 says do: `date-list-year $DATE_FORMAT_SHORT | tail -n 7`
 - Accepts an optional first argument that specifies the date format
 
->Usage: date-list-year | tail -n 3 <br>
+>**Usage**: date-list-year | tail -n 3 <br>
 20191202 <br>
 20191203 <br>
 20191204 <br>

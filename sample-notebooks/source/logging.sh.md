@@ -1,49 +1,50 @@
 <!-- MarkdownTOC -->
 
 - About
-    - Documentation
+    - Usage example
     - Dependencies
-- Defaults
-- Switch
-- Formatters
+        - Defaults
+- Functions
+    - Config
+        - Settings
+        - Switch
+    - Loggers
         - Message without timestamp
         - Message with timestamp
         - Header with timestamp
         - Separator
 
-<!-- /MarkdownTOC --> 
+<!-- /MarkdownTOC -->
 
 # About
-- Better than using echo because it saves effort spent on
-    + Redirecting echo's output to stderr
-    + Redirecting echo's output to a file
-    + Adding timestamp
-- This file is deliberately simple because advanced logging is needed in complex scripts which should be written in kotlin
-- Provides functions to:
-    + Log a message with different formattings
+- This notebook defines functions related to logging on the Shell.
+- The notebook has been kept deliberately simple. If you've reached a point where advanced logging, such as DEBUG and INFO levels or multiple appenders are needed, you should ditch the Shell and upgrade your script to Groovy or Golang. Thank me later.
+- Provides functionality related to:
+    + Logging a message
     + Switch logging on/off
-- Does not provide functions to
-    + Switch log destination: this is rarely done. To do this change the value of variables
-- All functions are exported so that they are available to scripts (executed using `./`)
+    + Routing log output to a file or console
+    + Formatting the log message
 
-## Documentation
-- Simple usage
-```
-logh Syncing SVN to git
-logt Fetching files
-log Entry without time
-logt Finished
+## Usage example
+- Following set of statements
+```bash
+logh Starting app deployment
+logt Retrieving deployment artifacts
+log Fetching v6.1.3 release files
+logt Retrieval successful
 logs
+logt Copying to destination directories
 ```
-- Output
+- Would give following output
 ```
 ############################
-#    SYNCING SVN TO GIT    #
+#  STARTING APP DEPLOYMENT #
 ############################
-[05Mar19-19.24.03] - Fetching files
-Entry without time
-[05Mar19-19.24.04] - Finished
+[05Mar19-19.24.03] - Retrieving deployment artifacts
+Fetching v6.1.3 release files
+[05Mar19-19.24.04] - Retrieval successful
 ________________________________________________
+[05Mar19-19.24.06] - Copying to destination directories
 ```
 
 ## Dependencies
@@ -51,11 +52,14 @@ ________________________________________________
 mars-load-dep datetime
 ```
 
+### Defaults
+- By default, file logging is turned off and console log is enabled.
+- The default destination is a file called *shell.[currentDate].log* in tmp directory. For example, `/tmp/shell.20Mar20.log` 
 
-# Defaults
-- File log is turned off and console log enabled by default
-- Kotlin scripts use `FILE_LOG_LEVEL` so there should be no conflicts here
-- Default destination is a file called `shell.05Mar19.log` in tmp directory directory. This is defined as a function and not a variable, so that each log function invocation gets today's date and not the date when the function was sourced
+# Functions
+## Config
+### Settings
+- Configuration settings related to logging.
 
 ```shell
 export FILE_LOG=off
@@ -68,8 +72,13 @@ __log-default-filename() {
 }; export -f __log-default-filename
 ```
 
-# Switch
-- Switch logging on or off
+### Switch
+- Switch logging on or off.
+
+>**Usage**: To switch console logging on run
+log-on-file
+Any statements logged via the log function would then start appearing on console.
+
 ```shell
 log-on-file() {
     log "Sending logs to `__log-default-filename`"
@@ -89,8 +98,12 @@ log-off-console() {
 }; export -f log-off-console
 ```
 
-# Formatters
+## Loggers
 ### Message without timestamp
+- Log a given message as is without time or any formatting.
+
+>**Usage**: log "This is my log message" 
+
 ```shell
 log() {
     if [[ $CONSOLE_LOG == "on" ]]; then
@@ -103,7 +116,10 @@ log() {
 ```
 
 ### Message with timestamp
-> Usage: log string1 string2 ...
+- Naming: **logt**imed
+- Logs the given message with time.
+
+>**Usage**: logt "This is my log message"
 
 ```shell
 logt() {
@@ -116,14 +132,16 @@ __echo-err() {
 ```
 
 ### Header with timestamp
-- Converts the log message to upper case and wraps it in separator to distinguish it from other log entries
+- Naming: **logh**eader
+- Converts the log message to the upper case and wraps it in special characters to distinguish it from other log entries.
 
->Usage: logh starting server
+>**Usage**: logh starting server
+Would print:
 
 ```
-=========
-23Sept17 14:00 - STARTING SERVER
-=========
+#########################
+#    STARTING SERVER    #
+#########################
 ```
 
 ```shell
@@ -141,6 +159,12 @@ logh() {
 ```
 
 ### Separator
+- Naming: **logs**eparator
+- Logs a line separator `________`
+- This can be used to group together log entries and separate sections of the log.
+
+>Usage: logs
+
 ```shell
 logs() {
     local separatorChar='_'

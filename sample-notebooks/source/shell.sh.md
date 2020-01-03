@@ -5,35 +5,35 @@
     - Dependencies
     - Global settings
 - Shortcuts
-        - Variable echo
+    - Variable echo
 - Pipes/redirection
-        - Pipe check
-            - Pipe stdin to temp file
-        - Buffer pipe data before forwarding
+    - Pipe check
+        - Pipe stdin to temp file
+    - Buffer pipe data
 - Export management
-        - Show exported functions
-        - Show functions defined but not exported
-        - Export all currently unexported functions
+    - Show exported functions
+    - Show functions defined but not exported
+    - Export all currently unexported functions
 - Deprecated
-        - Number check
-        - Dynamically function definition
-        - Pipe check
+    - Number check
+    - Dynamically function definition
+    - Pipe check
 
 <!-- /MarkdownTOC -->
 
 # About
-- General shell related utility functions
+- This notebook defines general shell related utility functions
 
-## TODO
-- Refactor the scripts and delete the deprecated function `shell-is-pipe-input` replacing all occurrences with `shell-is-pipe-input-new`. For now both versions are being maintained as deletion would require extensive refactoring
+### TODO
+- Refactor the scripts and delete the deprecated function `shell-is-pipe-input` replacing all occurrences with `shell-is-pipe-input-new`. Keeping both the versions for now to avoid extensive refactoring.
 
-## Dependencies
+### Dependencies
 ```shell
 mars-load-dep logging
 mars-load-dep files
 ```
 
-## Global settings
+### Global settings
 ```shell
 export SUCCESS=0
 export FAILURE=1
@@ -41,9 +41,9 @@ export FAILURE=1
 
 # Shortcuts
 ### Variable echo
-- Prints a variable by name while ignoring case. Allows for easier variable printing as you can omit `$`  and don't have to upper case variable names
+- Prints a variable by name while ignoring case. Allows for easier variable printing as you can omit `$`  and don't have to upper case variable names.
 
->Usage:
+>**Usage**:
 ABC=123
 echo $ABC # Prints 123
 e abc # Prints 123
@@ -57,11 +57,13 @@ e() {
 
 # Pipes/redirection
 ### Pipe check
-- Lets you see check input is coming from pipe or from keyboard/arguments
-- Input coming from pipe does not mean nothing will come from terminal. Function can still have arugments in addition to pipe input `echo a | f 1 2`
-- `shell-is-pipe-input` returns TRUE if input is coming from a pipe, FALSE if from a terminal
+- Lets you see check input is coming from a pipe or from arguments.
+- A connected pipe does not imply that there are no arguments. A function can still have arguments in addition to pipe input `echo a | func 1 2`
 
->**Usage**: shell-is-pipe-input-new && echo YES
+>**Usage**: echo a | shell-is-pipe-input-new
+TRUE
+shell-is-pipe-input-new
+FALSE
 
 ```shell
 shell-is-pipe-input-new() {
@@ -70,17 +72,8 @@ shell-is-pipe-input-new() {
     else
         return $TRUE
     fi
-}
+}; export -f shell-is-pipe-input-new 
 
-export -f shell-is-pipe-input-new # Export the function so it is available 
-```
-
->**Usage**: echo a | bash-is-pipe-input
-TRUE
-bash-is-pipe-input
-FALSE
-
-```shell
 TERMINAL_INPUT=0
 TERMINAL_OUTPUT=1
 
@@ -102,9 +95,9 @@ _shell-is-terminal-output() {
 ```
 
 #### Pipe stdin to temp file
-- Returns the name of the temp file
+- Directs all data from stdin to a temporary file and returns the name of the file
 
->Usage: echo abc | shell-stdin-to-temp-file 
+>**Usage**: echo abc | shell-stdin-to-temp-file 
 
 ```shell
 shell-stdin-to-temp-file() {
@@ -120,11 +113,13 @@ shell-stdin-to-temp-file() {
 }
 ```
 
-### Buffer pipe data before forwarding
-- Different from sponge in that the data is buffered in a file, whereas sponge buffers it in memory
-- Takes an optional filename argument to which to write data after buffering. Redirecting to the file `tmp > myfile.txt` would not work
+### Buffer pipe data
+- Stores the data from pipe into a temporary file and then prints out the file
+- Typical usage is to wait for all the data to arrive and process it in one go
+- Different from the standard Linux utility `sponge` in that the data is buffered in a file, whereas sponge buffers it in memory
+- Takes an optional filename argument to which to write data after buffering
 
->Usage: cat myfile.txt | grep -v something | tmp myfile.txt
+>**Usage**: cat myfile.txt | grep -v something | tmp myfile.txt
 
 ```shell
 TMP_BUFFER_FILE=/tmp/`files-random-name`
@@ -156,11 +151,11 @@ shell-exported-var() {
 ### Show functions defined but not exported
 ```shell
 shell-unexported-fn() {
-    declare -F | grep -v '\-fx' # -fx means already exported
+    declare -F | grep -v '\-fx' # -fx means function is exported
 }
 
 shell-unexported-var() {
-    declare -p | grep -v "declare -x" # -x means already exported
+    declare -p | grep -v "declare -x" # -x means variable is exported
 }
 ```
 
@@ -191,7 +186,7 @@ shell-export-env() {
 # Deprecated
 ### Number check
 - Checks if given input is a valid integer
-- **Deprecated because**: use regex matching which is a more generic solution. For example: `input | str-regex-match '\d+'` to test if the given input contains one or more numeric digits
+- **Deprecated because**: use regex matching, which is a more generic solution. For example: `input | str-regex-match '\d+'` to test if the given input contains one or more numeric digits
 
 ```shell
 shell-is-number() {
@@ -213,7 +208,7 @@ shell-is-number() {
 - Dynamically defines a function with the given name and command
 - **Deprecated because**
     + Seems it doesn't get used often 
-    + Eval is evil 
+    + Eval is evil
 
 >**Usage**: shell-fn-define myfunction 'echo a'
 
@@ -225,7 +220,7 @@ shell-fn-define() {
 
 ### Pipe check
 - Checks if a pipe is connected via STDIN
-- **Deprecated because**: outputs string `"TRUE"` instead of boolean `TRUE`. This was fixed in the new function
+- **Deprecated because**: outputs the string `"TRUE"` instead of boolean `TRUE`. Prefer the new function `shell-is-pipe-input-new`
 
 >**Usage**: see the new function
 
