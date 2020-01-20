@@ -16,7 +16,7 @@ https://en.wikipedia.org/wiki/Project_Jupyter
 Mars notebooks provide similar functionality for Shell Scripts.
 
 #### Video documentation
-An overview of the framework and usage instructions are provided here [url]
+An overview of the framework and usage instructions are provided [here](https://youtu.be/CxGNWOHBAaI).
 
 #### Best practices
 - Each notebook should have the following sections
